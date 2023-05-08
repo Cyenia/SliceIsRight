@@ -14,7 +14,6 @@ namespace SliceIsRight;
 public sealed class SliceIsRightPlugin : IDalamudPlugin
 {
     private const float HalfPi = 1.57079637f;
-    private const ushort GoldSaucerTerritoryId = 144;
     private const float MaxDistance = 30f;
     
     private readonly uint _colourBlue = ImGui.GetColorU32(ImGui.ColorConvertFloat4ToU32(new Vector4(0.0f, 0.0f, 1f, 0.15f)));
@@ -22,7 +21,7 @@ public sealed class SliceIsRightPlugin : IDalamudPlugin
     private readonly uint _colourRed = ImGui.GetColorU32(ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 0.0f, 0.0f, 0.4f)));
     private readonly IDictionary<uint, DateTime> _objectsAndSpawnTime = new Dictionary<uint, DateTime>();
 
-    private bool IsInGoldSaucer { get; set; }
+    private static bool IsInGoldSaucer => Services.ClientState.TerritoryType == 144;
     
     public string Name => "Slice is Right";
     
@@ -31,14 +30,11 @@ public sealed class SliceIsRightPlugin : IDalamudPlugin
         pluginInterface.Create<Services>();
 
         Services.PluginInterface.UiBuilder.Draw += DrawUI;
-        Services.ClientState.TerritoryChanged += TerritoryChanged;
-        IsInGoldSaucer = Services.ClientState.TerritoryType == GoldSaucerTerritoryId;
     }
 
     public void Dispose()
     {
         Services.PluginInterface.UiBuilder.Draw -= DrawUI;
-        Services.ClientState.TerritoryChanged -= TerritoryChanged;
     }
 
     private void DrawUI()
@@ -56,8 +52,6 @@ public sealed class SliceIsRightPlugin : IDalamudPlugin
             }
         }
     }
-    
-    private void TerritoryChanged(object? sender, ushort e) => IsInGoldSaucer = e == GoldSaucerTerritoryId;
     
     private static float DistanceToPlayer(Vector3 center)
     {
